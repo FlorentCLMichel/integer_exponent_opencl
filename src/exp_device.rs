@@ -77,7 +77,7 @@ impl<'a, T: Number> ExpModComp<'a, T> {
 
         // map the input array if not CL_MEM_SVM_FINE_GRAIN_BUFFER
         if !self.input_vec.is_fine_grained() {
-            self.queue.enqueue_svm_map(CL_BLOCKING, CL_MAP_WRITE, &mut self.input_vec, &[]);
+            self.queue.enqueue_svm_map(CL_BLOCKING, CL_MAP_WRITE, &mut self.input_vec, &[])?;
         }
 
         // copy the input to the SVN vector
@@ -86,7 +86,7 @@ impl<'a, T: Number> ExpModComp<'a, T> {
         // unmap the input array if not CL_MEM_SVM_FINE_GRAIN_BUFFER
         if !self.input_vec.is_fine_grained() {
             let unmap_event = self.queue.enqueue_svm_unmap(&mut self.input_vec, &[])?;
-            unmap_event.wait();
+            unmap_event.wait()?;
         }
 
         // run the calculation
@@ -101,7 +101,7 @@ impl<'a, T: Number> ExpModComp<'a, T> {
 
         // map the output array if not CL_MEM_SVM_FINE_GRAIN_BUFFER
         if !self.output_vec.is_fine_grained() {
-            self.queue.enqueue_svm_map(CL_BLOCKING, CL_MAP_READ, &mut self.output_vec, &[]);
+            self.queue.enqueue_svm_map(CL_BLOCKING, CL_MAP_READ, &mut self.output_vec, &[])?;
         }
 
         // Read the results
@@ -111,7 +111,7 @@ impl<'a, T: Number> ExpModComp<'a, T> {
         // unmap the output array if not CL_MEM_SVM_FINE_GRAIN_BUFFER
         if !self.output_vec.is_fine_grained() {
             let unmap_event = self.queue.enqueue_svm_unmap(&mut self.output_vec, &[])?;
-            unmap_event.wait();
+            unmap_event.wait()?;
         }
 
         Ok(y)
@@ -159,14 +159,14 @@ mod tests {
 
     #[test]
     fn build_context() {
-        let context = define_context(0);
+        let _context = define_context(0).unwrap();
     }
     
     #[test]
     fn build_expmodcomp() {
         let n_elements: usize = 10;
         let context = define_context(0).unwrap();
-        let core = ExpModComp::<u32>::new("./src/exp_device.cl", n_elements, &context).unwrap();
+        let _core = ExpModComp::<u32>::new("./src/exp_device.cl", n_elements, &context).unwrap();
     }
     
     #[test]
