@@ -12,7 +12,7 @@ fn main() {
     let x: Vec<u32> = (0..(m as u32)).collect();
 
     // define the GPU context
-    let context = define_context().unwrap();
+    let context = define_context(0).unwrap();
         
     // define the GPU compute core
     let mut core = ExpModComp::<u32>::new("./src/exp_device.cl", m, &context).unwrap();

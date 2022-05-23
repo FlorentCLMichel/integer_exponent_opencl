@@ -20,17 +20,18 @@ pub struct ExpModComp<'a, T: Number> {
 }
 
 
-pub fn define_context() -> Result<Context, ExpModError>
+pub fn define_context(index_gpu: usize) -> Result<Context, ExpModError>
 {
     // Find a usable platform and device for this application
     let platforms = opencl3::platform::get_platforms()?;
     let platform = platforms.first()
                             .ok_or(ExpModError { message: "No platform found".to_string() })?;
-    let device = *platform
-        .get_devices(CL_DEVICE_TYPE_GPU)?
-        .first()
-        .ok_or(ExpModError { message: "No GPU found".to_string() })?;
-    let device = Device::new(device);
+    let devices = platform
+        .get_devices(CL_DEVICE_TYPE_GPU)?;
+    if devices.len() < index_gpu + 1 {
+        return Err(ExpModError { message: format!("No GPU with index {}", index_gpu)});
+    }
+    let device = Device::new(devices[index_gpu]);
     
     // Create a Context on an OpenCL device
     Ok(Context::from_device(&device)?)
@@ -158,20 +159,20 @@ mod tests {
 
     #[test]
     fn build_context() {
-        let context = define_context();
+        let context = define_context(0);
     }
     
     #[test]
     fn build_expmodcomp() {
         let n_elements: usize = 10;
-        let context = define_context().unwrap();
+        let context = define_context(0).unwrap();
         let core = ExpModComp::<u32>::new("./src/exp_device.cl", n_elements, &context).unwrap();
     }
     
     #[test]
     fn expmodcomp_0() {
         let n_elements: usize = 10;
-        let context = define_context().unwrap();
+        let context = define_context(0).unwrap();
         let mut core = ExpModComp::<u32>::new("./src/exp_device.cl", n_elements, &context).unwrap();
         let n: u32 = 0;
         let q: u32 = 10;
@@ -186,7 +187,7 @@ mod tests {
     #[test]
     fn expmodcomp_1() {
         let n_elements: usize = 10;
-        let context = define_context().unwrap();
+        let context = define_context(0).unwrap();
         let mut core = ExpModComp::<u32>::new("./src/exp_device.cl", n_elements, &context).unwrap();
         let n: u32 = 1;
         let q: u32 = 10;
@@ -201,7 +202,7 @@ mod tests {
     #[test]
     fn expmodcomp_2() {
         let n_elements: usize = 10;
-        let context = define_context().unwrap();
+        let context = define_context(0).unwrap();
         let mut core = ExpModComp::<u32>::new("./src/exp_device.cl", n_elements, &context).unwrap();
         let n: u32 = 2;
         let q: u32 = 10;
