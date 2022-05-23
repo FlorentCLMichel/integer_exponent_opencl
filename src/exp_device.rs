@@ -85,7 +85,7 @@ impl<'a, T: Number> ExpModComp<'a, T> {
         
         // unmap the input array if not CL_MEM_SVM_FINE_GRAIN_BUFFER
         if !self.input_vec.is_fine_grained() {
-            let unmap_event = self.queue.enqueue_svm_unmap(&mut self.input_vec, &[])?;
+            let unmap_event = self.queue.enqueue_svm_unmap(&self.input_vec, &[])?;
             unmap_event.wait()?;
         }
 
@@ -110,7 +110,7 @@ impl<'a, T: Number> ExpModComp<'a, T> {
         
         // unmap the output array if not CL_MEM_SVM_FINE_GRAIN_BUFFER
         if !self.output_vec.is_fine_grained() {
-            let unmap_event = self.queue.enqueue_svm_unmap(&mut self.output_vec, &[])?;
+            let unmap_event = self.queue.enqueue_svm_unmap(&self.output_vec, &[])?;
             unmap_event.wait()?;
         }
 

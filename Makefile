@@ -7,6 +7,9 @@ test:
 debug: 
 	cargo build --offline
 
+clippy:
+	cargo clippy --offline
+
 clean: 
 	rm -rf target
 	rm -f Cargo.lock
